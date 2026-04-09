@@ -45,12 +45,22 @@ profile_default/
 *.pickle
 *.h5
 *.hdf5
+*.csv
+*.zip
+
+# AutoGluon trained predictors (large; retrain from notebooks)
+AutogluonModels/
+
+# CatBoost training logs (if created next to notebooks)
+catboost_info/
 
 # Optional: ignore raw survey dumps if you only keep derived sets in git
 # Uncomment if large CSVs should stay local-only:
 data/
+examples/
 
 ai_docs/
 rules/
 
 so_survey_2025_profile_report.html
+*.html
