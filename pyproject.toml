@@ -7,6 +7,7 @@ dependencies = [
     "autogluon-tabular[all]>=1.5.0",
     "ipykernel>=7.2.0",
     # Ranges compatible with AutoGluon Tabular 1.5.x (full `autogluon` also needs numpy<2.2 via timeseries).
+    "nbformat>=5.10.4",
     "numpy>=1.26,<2.2",
     "pandas>=2.0,<2.3",
     "pyspark>=4.1.1",
