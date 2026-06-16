@@ -85,6 +85,22 @@ FEATURE_IMPORTANCE = {
 }
 
 
+COUNTRY_RENAMES = {
+    "United States of America": "USA",
+    "United Kingdom of Great Britain and Northern Ireland": "UK",
+}
+
+# Defaults for the predictor form (most common / representative values).
+FORM_DEFAULTS = {
+    "Country": "Germany",
+    "DevType": "Data engineer",
+    "Employment": "Employed",
+    "OrgSize": "100 to 499 employees",
+    "RemoteWork": "Hybrid (some in-person, leans heavy to flexibility)",
+    "EdLevel": "Bachelor\u2019s degree (B.A., B.S., B.Eng., etc.)",
+}
+
+
 def _clean_survey(df: pd.DataFrame) -> pd.DataFrame:
     """Apply the same cleaning pipeline used in the comp_prediction notebook (v2)."""
     df = df[df["MainBranch"] == "I am a developer by profession"].copy()
@@ -105,6 +121,8 @@ def _clean_survey(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df[df[TARGET] >= COMP_MIN]
     df = df[df[TARGET] <= COMP_MAX]
+
+    df["Country"] = df["Country"].replace(COUNTRY_RENAMES)
 
     return df.reset_index(drop=True)
 
@@ -132,3 +150,24 @@ def get_column_options(df: pd.DataFrame, col: str) -> list[str]:
     """Return sorted unique non-null values for a categorical column."""
     vals = df[col].dropna().unique().tolist()
     return sorted(vals)
+
+
+def wrap_label(text: str, max_width: int = 35) -> str:
+    """Insert ``<br>`` tags into *text* so no line exceeds *max_width* chars.
+
+    Used for Plotly y-axis tick labels that would otherwise be too wide.
+    """
+    words = text.split()
+    lines: list[str] = []
+    current = ""
+    for w in words:
+        candidate = f"{current} {w}".strip()
+        if len(candidate) <= max_width:
+            current = candidate
+        else:
+            if current:
+                lines.append(current)
+            current = w
+    if current:
+        lines.append(current)
+    return "<br>".join(lines)

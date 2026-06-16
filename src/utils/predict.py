@@ -5,7 +5,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from utils.data_loader import INPUT_FEATURES, LOG_TARGET, TARGET
+from utils.data_loader import COUNTRY_RENAMES, INPUT_FEATURES, LOG_TARGET, TARGET
+
+_REVERSE_COUNTRY = {v: k for k, v in COUNTRY_RENAMES.items()}
 
 # Approximate MAE (in USD) of the v2 model on the test set.
 MODEL_MAE_USD = 28_671
@@ -46,7 +48,7 @@ def build_input_row(
     """
     row: dict = {feat: np.nan for feat in _ALL_MODEL_FEATURES}
     row["MainBranch"] = "I am a developer by profession"
-    row["Country"] = country
+    row["Country"] = _REVERSE_COUNTRY.get(country, country)
     row["WorkExp"] = work_exp
     row["OrgSize"] = org_size
     row["YearsCode"] = years_code
@@ -95,7 +97,10 @@ def compute_whatif_deltas(
     return the delta compared to *base_salary*, sorted by delta descending.
     """
     rows = pd.concat([base_row] * len(options), ignore_index=True)
-    rows[feature] = options
+    model_values = options
+    if feature == "Country":
+        model_values = [_REVERSE_COUNTRY.get(o, o) for o in options]
+    rows[feature] = model_values
 
     log_preds = predictor.predict(rows)
     results = []
